@@ -190,7 +190,7 @@ tbody tr:hover{background:#101a2c;}
       <b style="color:#fff">92%</b>
     </div>
     <div class="db-sep"></div>
-    <span class="status-chip ok">● SEM NECESSIDADE DE REPLANTIO</span>
+    <span class="status-chip ok">● REPLANTIO NÃO RECOMENDADO NESTA FASE</span>
   </div>
 
   <div class="tabs">
@@ -561,7 +561,7 @@ tbody tr:hover{background:#101a2c;}
   </div>
 
   <div class="footer">
-    Dashboard gerado a partir do Relatório Técnico de Monitoramento — UFV Rio do Peixe I e II — Julho/2026 · Bragagnoli Ambiental (CTF/AIDA 8805586) · Diretor Técnico: Railson Nogueira de Arruda, Eng. Ambiental, CREA-PB RNP 1619008858, ART PB20250690039
+    Dashboard gerado a partir do Relatório Técnico de Monitoramento — UFV Rio do Peixe I e II — Junho/2026 · Bragagnoli Ambiental (CTF/AIDA 8805586) · Diretor Técnico: Railson Nogueira de Arruda, Eng. Ambiental, CREA-PB RNP 1619008858, ART PB20250690039
   </div>
 
 </div>
@@ -586,7 +586,8 @@ new Chart(document.getElementById('chartSurvival'), {
     labels:['Espécies Nativas','Espécies Não Nativas'],
     datasets:[
       {label:'Maio', data:[70,30], backgroundColor:BLUE, borderRadius:6},
-      {label:'Junho', data:[70,30], backgroundColor:GREEN, borderRadius:6}
+      {label:'Junho', data:[70,30], backgroundColor:CYAN, borderRadius:6},
+      {label:'Julho', data:[70,30], backgroundColor:GREEN, borderRadius:6}
     ]
   },
   options:{responsive:true, scales:{y:{beginAtZero:true,max:80,ticks:{callback:v=>v+'%'}}}, plugins:{legend:{position:'bottom'}}}
