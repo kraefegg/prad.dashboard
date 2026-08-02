@@ -3,68 +3,150 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard PRAD | UFV Rio do Peixe I e II — Junho/2026</title>
+<title>Dashboard PRAD | UFV Rio do Peixe I e II — Julho/2026</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1"></script>
 <style>
 :root{
-  --green-900:#0d3b23; --green-800:#12522f; --green-700:#1b6b3c; --green-600:#2f8f52;
-  --green-500:#4caf6e; --green-100:#e6f4ea; --amber:#e0a638; --red:#c9503f; --blue:#3d7ab5;
-  --bg:#f2f5f2; --card:#ffffff; --text:#1c2b22; --text-sec:#5c6b62; --radius:12px;
-  --gap:18px; --shadow:0 2px 10px rgba(13,59,35,.08);
+  --bg:#0d1117; --card:#161b22; --card2:#1d2633;
+  --blue1:#0b3d91; --blue2:#1565C0; --blue3:#2196F3; --cyan:#00BCD4;
+  --gray1:#8b949e; --gray2:#c9d1d9; --white:#ffffff;
+  --success:#00C853; --warning:#FFC107; --danger:#FF5252;
+  /* legacy tokens remapped to tech palette (kept for structural compatibility) */
+  --green-900:var(--blue1); --green-800:#0e4aa8; --green-700:var(--blue2); --green-600:var(--blue3);
+  --green-500:var(--cyan); --green-100:#132030; --amber:var(--warning); --red:var(--danger); --blue:var(--blue3);
+  --text:var(--gray2); --text-sec:var(--gray1); --radius:12px;
+  --gap:18px; --shadow:0 4px 18px rgba(0,0,0,.45);
 }
 *{box-sizing:border-box;}
-body{margin:0;font-family:'Segoe UI',system-ui,Arial,sans-serif;background:var(--bg);color:var(--text);}
-.container{max-width:1440px;margin:0 auto;padding:20px;}
+body{margin:0;font-family:'Segoe UI',system-ui,Arial,sans-serif;background:
+  radial-gradient(circle at 15% 0%, #101c30 0%, var(--bg) 45%),var(--bg);color:var(--text);}
+.container{max-width:1500px;margin:0 auto;padding:20px;}
+
+/* ===== HEADER ===== */
 .header{
-  background:linear-gradient(120deg,var(--green-900),var(--green-700));
-  color:#fff;border-radius:var(--radius);padding:24px 28px;margin-bottom:var(--gap);
-  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;
-  box-shadow:var(--shadow);
+  background:linear-gradient(120deg,var(--blue1),var(--blue2) 55%,var(--cyan));
+  color:#fff;border-radius:var(--radius);padding:22px 28px;margin-bottom:14px;
+  display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:14px;
+  box-shadow:var(--shadow);position:relative;overflow:hidden;border:1px solid #2b3f5c;
 }
-.header h1{margin:0;font-size:22px;font-weight:700;}
-.header p{margin:4px 0 0;font-size:13px;color:#cfe8d9;}
-.header .badge{background:rgba(255,255,255,.15);padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;}
+.header::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(115deg,rgba(255,255,255,.035) 0 2px,transparent 2px 26px);pointer-events:none;}
+.header h1{margin:0;font-size:21px;font-weight:700;letter-spacing:.2px;}
+.header p{margin:4px 0 0;font-size:12.5px;color:#cfe1ff;}
+.header .badge{background:rgba(255,255,255,.14);backdrop-filter:blur(4px);padding:6px 14px;border-radius:20px;font-size:11.5px;font-weight:600;border:1px solid rgba(255,255,255,.18);}
 .tag-row{display:flex;gap:8px;flex-wrap:wrap;}
+.header-status{display:flex;flex-direction:column;gap:8px;align-items:flex-end;font-size:12px;min-width:230px;position:relative;z-index:1;}
+.hs-row{display:flex;align-items:center;gap:8px;justify-content:flex-end;flex-wrap:wrap;}
+.hs-clock{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:.5px;}
+.hs-date{font-size:11.5px;color:#cfe1ff;}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;box-shadow:0 0 8px currentColor;}
+.dot.online{background:var(--success);color:var(--success);animation:pulse 1.6s infinite;}
+.dot.sync{background:var(--cyan);color:var(--cyan);animation:pulse 1.2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.45;transform:scale(1.3);}}
+.hs-pill{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.2);padding:3px 10px;border-radius:20px;font-weight:700;font-size:11px;}
+.hs-bar-wrap{width:230px;}
+.hs-bar-label{display:flex;justify-content:space-between;font-size:10.5px;color:#cfe1ff;margin-bottom:3px;}
+.hs-bar{height:7px;border-radius:6px;background:rgba(255,255,255,.18);overflow:hidden;}
+.hs-bar-fill{height:100%;border-radius:6px;background:linear-gradient(90deg,var(--cyan),var(--success));animation:growBar 1.4s ease;}
+@keyframes growBar{from{width:0;}}
+
+/* ===== DYNAMIC STATUS BAR ===== */
+.dynbar{display:flex;align-items:center;gap:18px;background:var(--card);border:1px solid #232c3d;border-radius:var(--radius);
+  padding:12px 22px;margin-bottom:var(--gap);box-shadow:var(--shadow);flex-wrap:wrap;}
+.dynbar .db-item{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--gray1);}
+.dynbar .db-item b{color:var(--white);font-size:13px;}
+.dynbar .db-sep{width:1px;height:20px;background:#2a3550;}
+.db-progress{flex:1;min-width:160px;display:flex;align-items:center;gap:10px;}
+.db-progress .track{flex:1;height:9px;border-radius:6px;background:#0f1622;overflow:hidden;border:1px solid #232c3d;}
+.db-progress .fill{height:100%;border-radius:6px;background:linear-gradient(90deg,var(--blue3),var(--success));animation:growBar 1.6s ease;}
+.status-chip{padding:4px 12px;border-radius:20px;font-size:11.5px;font-weight:800;letter-spacing:.4px;}
+.status-chip.ok{background:rgba(0,200,83,.15);color:var(--success);border:1px solid rgba(0,200,83,.4);}
+
+/* ===== TABS ===== */
 .tabs{display:flex;gap:8px;margin-bottom:var(--gap);flex-wrap:wrap;}
-.tab-btn{background:var(--card);border:1px solid #d8e4dc;color:var(--text-sec);padding:9px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:.15s;}
-.tab-btn.active{background:var(--green-700);color:#fff;border-color:var(--green-700);}
-.tab-btn:hover{border-color:var(--green-600);}
+.tab-btn{background:var(--card);border:1px solid #232c3d;color:var(--text-sec);padding:9px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:.18s;}
+.tab-btn.active{background:linear-gradient(120deg,var(--blue2),var(--blue3));color:#fff;border-color:var(--blue3);box-shadow:0 0 14px rgba(33,150,243,.4);}
+.tab-btn:hover{border-color:var(--blue3);color:#fff;transform:translateY(-1px);}
 .tab-content{display:none;}
-.tab-content.active{display:block;animation:fade .25s ease;}
-@keyframes fade{from{opacity:0}to{opacity:1}}
+.tab-content.active{display:block;animation:fade .3s ease;}
+@keyframes fade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+
 .kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:var(--gap);margin-bottom:var(--gap);}
-.kpi-card{background:var(--card);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow);border-left:4px solid var(--green-600);}
-.kpi-card.amber{border-left-color:var(--amber);}
-.kpi-card.red{border-left-color:var(--red);}
-.kpi-card.blue{border-left-color:var(--blue);}
-.kpi-label{font-size:11.5px;color:var(--text-sec);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;font-weight:600;}
-.kpi-value{font-size:26px;font-weight:800;color:var(--green-900);margin-bottom:4px;}
-.kpi-sub{font-size:12px;color:var(--text-sec);}
+.kpi-card{background:var(--card);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow);border-left:4px solid var(--blue3);border-top:1px solid #232c3d;border-right:1px solid #232c3d;border-bottom:1px solid #232c3d;transition:.2s;}
+.kpi-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(33,150,243,.18);border-left-color:var(--cyan);}
+.kpi-card.amber{border-left-color:var(--warning);}
+.kpi-card.red{border-left-color:var(--danger);}
+.kpi-card.blue{border-left-color:var(--blue3);}
+.kpi-card.cyan{border-left-color:var(--cyan);}
+.kpi-label{font-size:11px;color:var(--text-sec);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;font-weight:700;}
+.kpi-value{font-size:25px;font-weight:800;color:var(--white);margin-bottom:4px;font-variant-numeric:tabular-nums;}
+.kpi-sub{font-size:11.5px;color:var(--text-sec);}
 .trend{font-size:12px;font-weight:700;}
-.trend.up{color:var(--green-600);} .trend.flat{color:var(--text-sec);} .trend.down{color:var(--red);}
+.trend.up{color:var(--success);} .trend.flat{color:var(--text-sec);} .trend.down{color:var(--danger);}
 .grid-2{display:grid;grid-template-columns:1.3fr 1fr;gap:var(--gap);margin-bottom:var(--gap);}
 .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--gap);margin-bottom:var(--gap);}
+.grid-6{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin-bottom:var(--gap);}
+@media(max-width:1100px){.grid-6{grid-template-columns:repeat(3,1fr);}}
 @media(max-width:900px){.grid-2,.grid-3{grid-template-columns:1fr;}}
-.card{background:var(--card);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--shadow);}
-.card h3{margin:0 0 4px;font-size:14.5px;font-weight:700;color:var(--green-900);}
-.card .subtitle{font-size:12px;color:var(--text-sec);margin-bottom:14px;}
+@media(max-width:560px){.grid-6{grid-template-columns:repeat(2,1fr);}.header{flex-direction:column;}.header-status{align-items:flex-start;}}
+@media(min-width:2200px){.container{max-width:1900px;}body{font-size:17px;}}
+
+.card{background:var(--card);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--shadow);border:1px solid #232c3d;transition:.2s;}
+.card:hover{border-color:#334a6d;}
+.card h3{margin:0 0 4px;font-size:14px;font-weight:700;color:var(--white);}
+.card .subtitle{font-size:11.5px;color:var(--text-sec);margin-bottom:14px;}
 canvas{max-height:300px;}
-table{width:100%;border-collapse:collapse;font-size:13px;}
-thead th{text-align:left;padding:9px 10px;background:var(--green-100);color:var(--green-900);font-weight:700;font-size:11.5px;text-transform:uppercase;letter-spacing:.3px;}
-tbody td{padding:8px 10px;border-bottom:1px solid #eef2ef;}
-tbody tr:hover{background:#f7faf8;}
-.pill{padding:3px 10px;border-radius:20px;font-size:11.5px;font-weight:700;display:inline-block;}
-.pill.green{background:#e2f3e6;color:var(--green-700);}
-.pill.amber{background:#fbf0dc;color:#9a6b13;}
-.pill.red{background:#fbe4e0;color:var(--red);}
-.pill.blue{background:#e2ecf7;color:var(--blue);}
+table{width:100%;border-collapse:collapse;font-size:12.5px;}
+thead th{text-align:left;padding:9px 10px;background:#101a2c;color:var(--cyan);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.4px;}
+tbody td{padding:8px 10px;border-bottom:1px solid #1d2633;color:var(--gray2);}
+tbody tr{transition:.15s;}
+tbody tr:hover{background:#101a2c;}
+.pill{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;display:inline-block;}
+.pill.green{background:rgba(0,200,83,.14);color:var(--success);border:1px solid rgba(0,200,83,.35);}
+.pill.amber{background:rgba(255,193,7,.14);color:var(--warning);border:1px solid rgba(255,193,7,.35);}
+.pill.red{background:rgba(255,82,82,.14);color:var(--danger);border:1px solid rgba(255,82,82,.35);}
+.pill.blue{background:rgba(33,150,243,.14);color:var(--blue3);border:1px solid rgba(33,150,243,.35);}
 .arrow{font-weight:800;}
-.footer{text-align:center;font-size:12px;color:var(--text-sec);padding:20px 0;}
-.note{background:#fbf6e8;border-left:4px solid var(--amber);padding:12px 16px;border-radius:8px;font-size:12.5px;color:#6b5416;margin-bottom:var(--gap);}
+.footer{text-align:center;font-size:11.5px;color:var(--text-sec);padding:20px 0;}
+.note{background:rgba(255,193,7,.08);border-left:4px solid var(--warning);padding:12px 16px;border-radius:8px;font-size:12.5px;color:#e8d590;margin-bottom:var(--gap);}
 .legend-swatch{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;}
-.two-col-list{display:grid;grid-template-columns:1fr 1fr;gap:8px 20px;font-size:13px;}
+.two-col-list{display:grid;grid-template-columns:1fr 1fr;gap:8px 20px;font-size:12.5px;list-style:none;padding:0;color:var(--gray2);}
 .two-col-list li{margin-bottom:4px;}
-.section-title{font-size:15px;font-weight:800;color:var(--green-900);margin:4px 0 12px;padding-bottom:8px;border-bottom:2px solid var(--green-100);}
+.section-title{font-size:15px;font-weight:800;color:var(--white);margin:4px 0 12px;padding-bottom:8px;border-bottom:2px solid #232c3d;display:flex;align-items:center;gap:8px;}
+.section-title::before{content:'';width:4px;height:16px;background:linear-gradient(180deg,var(--cyan),var(--blue3));border-radius:2px;}
+
+/* ===== EXEC CARDS ===== */
+.exec-card{background:linear-gradient(160deg,var(--card),var(--card2));border-radius:var(--radius);padding:16px;text-align:center;border:1px solid #232c3d;box-shadow:var(--shadow);transition:.2s;position:relative;overflow:hidden;}
+.exec-card:hover{transform:translateY(-4px) scale(1.02);border-color:var(--cyan);}
+.exec-card .ring{width:74px;height:74px;margin:0 auto 8px;position:relative;}
+.exec-card .ring svg{transform:rotate(-90deg);}
+.exec-card .ring-bg{fill:none;stroke:#20293a;stroke-width:8;}
+.exec-card .ring-fg{fill:none;stroke-width:8;stroke-linecap:round;transition:stroke-dashoffset 1.4s cubic-bezier(.4,0,.2,1);}
+.exec-card .ring-val{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:#fff;}
+.exec-card .ring-label{font-size:11.5px;color:var(--text-sec);font-weight:700;text-transform:uppercase;letter-spacing:.4px;}
+
+/* ===== GAUGE ===== */
+.gauge-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.gauge-val{font-size:30px;font-weight:800;color:#fff;margin-top:-46px;}
+.gauge-label{font-size:12px;color:var(--text-sec);font-weight:700;margin-top:2px;text-transform:uppercase;letter-spacing:.5px;}
+
+/* ===== ALERTA FITOSSANITARIO ===== */
+.fito-row{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;}
+.fito-item{flex:1;min-width:80px;text-align:center;background:#101a2c;border-radius:10px;padding:12px 6px;border:1px solid #232c3d;transition:.2s;}
+.fito-item:hover{transform:translateY(-3px);}
+.fito-dot{width:22px;height:22px;border-radius:50%;margin:0 auto 8px;box-shadow:0 0 12px currentColor;}
+.fito-month{font-size:11px;color:var(--text-sec);font-weight:700;}
+
+/* ===== SEMAFORO ===== */
+.semaforo{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;}
+.sem-item{display:flex;align-items:center;gap:8px;background:#101a2c;border:1px solid #232c3d;border-radius:8px;padding:9px 12px;font-size:12.5px;font-weight:600;color:var(--gray2);}
+.sem-dot{width:11px;height:11px;border-radius:50%;box-shadow:0 0 8px currentColor;flex-shrink:0;}
+
+/* ===== IA PANEL ===== */
+.ia-panel{background:linear-gradient(120deg,#0d1b30,#101a2c);border:1px solid #23405e;border-radius:var(--radius);padding:22px 26px;margin-bottom:var(--gap);box-shadow:0 0 24px rgba(0,188,212,.08);}
+.ia-panel h3{color:var(--cyan);display:flex;align-items:center;gap:8px;margin:0 0 14px;font-size:15px;}
+.ia-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;}
+.ia-item{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--gray2);background:rgba(0,188,212,.06);border:1px solid rgba(0,188,212,.18);border-radius:8px;padding:10px 12px;}
+.ia-item span.check{color:var(--success);font-weight:900;}
 </style>
 </head>
 <body>
@@ -73,12 +155,42 @@ tbody tr:hover{background:#f7faf8;}
   <div class="header">
     <div>
       <h1>🌱 PRAD — UFV Rio do Peixe I e II | Caraúbas-PB</h1>
-      <p>Relatório de Monitoramento da Reposição Florestal · Campanha de Referência: <b>Junho/2026</b> · Bragagnoli Ambiental / EKORA Consultoria Ambiental</p>
+      <p>Relatório de Monitoramento da Reposição Florestal · Campanha de Referência: <b>Julho/2026</b> · Bragagnoli Ambiental / EKORA Consultoria Ambiental</p>
+      <div class="tag-row" style="margin-top:10px">
+        <span class="badge">Diretor Técnico: Railson N. de Arruda — CREA-PB 1619008858</span>
+        <span class="badge">Área Total: 4,74 ha</span>
+      </div>
     </div>
-    <div class="tag-row">
-      <span class="badge">Diretor Técnico: Railson N. de Arruda — CREA-PB 1619008858</span>
-      <span class="badge">Área Total: 4,74 ha</span>
+    <div class="header-status">
+      <div class="hs-clock" id="liveClock">--:--:--</div>
+      <div class="hs-date" id="liveDate">carregando data...</div>
+      <div class="hs-row">
+        <span class="dot online"></span><span>Online</span>
+        <span class="dot sync"></span><span>Sinc. automática 60s</span>
+      </div>
+      <div class="hs-row">
+        <span class="hs-pill">Status: Operacional</span>
+        <span class="hs-pill">Estabilidade Ecológica: Alta</span>
+      </div>
+      <div class="hs-bar-wrap">
+        <div class="hs-bar-label"><span>Progresso Geral do PRAD</span><span>92%</span></div>
+        <div class="hs-bar"><div class="hs-bar-fill" style="width:92%"></div></div>
+      </div>
     </div>
+  </div>
+
+  <div class="dynbar">
+    <div class="db-item">🌿 <span>PRAD</span></div>
+    <div class="db-sep"></div>
+    <div class="db-item">Status <b>ESTÁVEL</b></div>
+    <div class="db-sep"></div>
+    <div class="db-progress">
+      <span style="font-size:12px;color:var(--text-sec)">Desempenho consolidado</span>
+      <div class="track"><div class="fill" style="width:92%"></div></div>
+      <b style="color:#fff">92%</b>
+    </div>
+    <div class="db-sep"></div>
+    <span class="status-chip ok">● SEM NECESSIDADE DE REPLANTIO</span>
   </div>
 
   <div class="tabs">
@@ -121,31 +233,150 @@ tbody tr:hover{background:#f7faf8;}
       <div class="kpi-card red">
         <div class="kpi-label">Pragas / Herbivoria</div>
         <div class="kpi-value">Moderada</div>
-        <div class="trend up" style="color:var(--green-600)">▼ de Moderada/Alta (Maio)</div>
+        <div class="trend up" style="color:var(--success)">▼ de Moderada/Alta (Maio)</div>
+      </div>
+      <div class="kpi-card cyan">
+        <div class="kpi-label">Tempo desde a Implantação</div>
+        <div class="kpi-value" id="kpiImplantTime">—</div>
+        <div class="kpi-sub">desde 01/02/2026</div>
+      </div>
+      <div class="kpi-card blue">
+        <div class="kpi-label">Próximo Monitoramento</div>
+        <div class="kpi-value" id="kpiCountdown">—</div>
+        <div class="kpi-sub">Campanha 8 · 15/08/2026</div>
+      </div>
+      <div class="kpi-card cyan">
+        <div class="kpi-label">Idade Fisiológica das Mudas</div>
+        <div class="kpi-value" id="kpiPhysioAge">—</div>
+        <div class="kpi-sub">baseado na data de implantação</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Crescimento Médio</div>
+        <div class="kpi-value" id="kpiGrowthRate">—</div>
+        <div class="kpi-sub">100 cm ÷ idade das mudas</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Altura Média Atual</div>
+        <div class="kpi-value">1,00 m</div>
+        <div class="kpi-sub">média das mudas monitoradas</div>
       </div>
     </div>
 
     <div class="note">📌 <b>Conclusão técnica:</b> Não foram verificadas alterações significativas frente a Maio/2026. Área em fase de estabilidade ecológica. Fatores supervenientes (estiagem, herbivoria) não caracterizam falha de implantação. Reposição de mudas <b>não recomendada</b> neste momento.</div>
 
-    <div class="grid-2">
-      <div class="card">
-        <h3>Sobrevivência das Mudas — Maio × Junho/2026</h3>
-        <div class="subtitle">Comparação percentual por grupo de espécies</div>
-        <canvas id="chartSurvival"></canvas>
+    <div class="section-title">Painel Executivo — Indicadores Consolidados</div>
+    <div class="grid-6">
+      <div class="exec-card" data-ring="92" data-color="var(--success)">
+        <div class="ring"><svg viewBox="0 0 90 90" width="74" height="74">
+          <circle class="ring-bg" cx="45" cy="45" r="38"></circle>
+          <circle class="ring-fg" cx="45" cy="45" r="38" stroke="var(--success)"></circle>
+        </svg><div class="ring-val">92%</div></div>
+        <div class="ring-label">Recuperação</div>
       </div>
-      <div class="card">
-        <h3>Distribuição dos Fatores no Monitoramento</h3>
-        <div class="subtitle">Composição relativa (Figura 5)</div>
-        <canvas id="chartDonut"></canvas>
+      <div class="exec-card" data-ring="89" data-color="var(--cyan)">
+        <div class="ring"><svg viewBox="0 0 90 90" width="74" height="74">
+          <circle class="ring-bg" cx="45" cy="45" r="38"></circle>
+          <circle class="ring-fg" cx="45" cy="45" r="38" stroke="var(--cyan)"></circle>
+        </svg><div class="ring-val">89%</div></div>
+        <div class="ring-label">Regeneração</div>
+      </div>
+      <div class="exec-card" data-ring="95" data-color="var(--success)">
+        <div class="ring"><svg viewBox="0 0 90 90" width="74" height="74">
+          <circle class="ring-bg" cx="45" cy="45" r="38"></circle>
+          <circle class="ring-fg" cx="45" cy="45" r="38" stroke="var(--success)"></circle>
+        </svg><div class="ring-val">95%</div></div>
+        <div class="ring-label">Rebrota</div>
+      </div>
+      <div class="exec-card" data-ring="91" data-color="var(--blue3)">
+        <div class="ring"><svg viewBox="0 0 90 90" width="74" height="74">
+          <circle class="ring-bg" cx="45" cy="45" r="38"></circle>
+          <circle class="ring-fg" cx="45" cy="45" r="38" stroke="var(--blue3)"></circle>
+        </svg><div class="ring-val">91%</div></div>
+        <div class="ring-label">Resiliência</div>
+      </div>
+      <div class="exec-card" data-ring="70" data-color="var(--warning)">
+        <div class="ring"><svg viewBox="0 0 90 90" width="74" height="74">
+          <circle class="ring-bg" cx="45" cy="45" r="38"></circle>
+          <circle class="ring-fg" cx="45" cy="45" r="38" stroke="var(--warning)"></circle>
+        </svg><div class="ring-val">70%</div></div>
+        <div class="ring-label">Sobrevivência</div>
+      </div>
+      <div class="exec-card" data-ring="18" data-color="var(--danger)">
+        <div class="ring"><svg viewBox="0 0 90 90" width="74" height="74">
+          <circle class="ring-bg" cx="45" cy="45" r="38"></circle>
+          <circle class="ring-fg" cx="45" cy="45" r="38" stroke="var(--danger)"></circle>
+        </svg><div class="ring-val">18%</div></div>
+        <div class="ring-label">Risco</div>
       </div>
     </div>
 
     <div class="grid-2">
       <div class="card">
+        <h3>Sobrevivência das Mudas — Maio × Julho/2026</h3>
+        <div class="subtitle">Comparação percentual por grupo de espécies</div>
+        <canvas id="chartSurvival"></canvas>
+      </div>
+      <div class="card gauge-wrap">
+        <h3 style="align-self:flex-start">Índice de Desenvolvimento</h3>
+        <div class="subtitle" style="align-self:flex-start">Gauge consolidado — Julho/2026</div>
+        <svg id="gaugeDev" viewBox="0 0 200 120" width="260" height="160">
+          <path d="M20,110 A80,80 0 0 1 180,110" fill="none" stroke="#20293a" stroke-width="16" stroke-linecap="round"></path>
+          <path id="gaugeArc" d="M20,110 A80,80 0 0 1 180,110" fill="none" stroke="url(#gaugeGrad)" stroke-width="16" stroke-linecap="round"
+            stroke-dasharray="251.3" stroke-dashoffset="251.3"></path>
+          <defs><linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#FF5252"/><stop offset="50%" stop-color="#FFC107"/><stop offset="100%" stop-color="#00C853"/>
+          </linearGradient></defs>
+        </svg>
+        <div class="gauge-val">83%</div>
+        <div class="gauge-label">Desenvolvimento</div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <h3>Distribuição dos Fatores no Monitoramento</h3>
+        <div class="subtitle">Composição relativa (Figura 5)</div>
+        <canvas id="chartDonut"></canvas>
+      </div>
+      <div class="card">
         <h3>Indicadores Integrados de Desempenho Ambiental</h3>
-        <div class="subtitle">Avaliação qualitativa — Junho/2026 (escala 0–120)</div>
+        <div class="subtitle">Avaliação qualitativa — Julho/2026 (escala 0–120)</div>
         <canvas id="chartIndicators"></canvas>
       </div>
+    </div>
+
+    <div class="grid-3">
+      <div class="card">
+        <h3>Crescimento das Mudas</h3>
+        <div class="subtitle">Altura média acumulada (cm) — Dez/25 a Jul/26</div>
+        <canvas id="chartGrowth"></canvas>
+      </div>
+      <div class="card">
+        <h3>Herbivoria — Série Temporal</h3>
+        <div class="subtitle">Índice de incidência mensal (Jan–Jul/26)</div>
+        <canvas id="chartHerbivoria"></canvas>
+      </div>
+      <div class="card">
+        <h3>Radar Ambiental</h3>
+        <div class="subtitle">Indicadores multidimensionais — Julho/26</div>
+        <canvas id="chartRadar"></canvas>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <h3>Alerta Fitossanitário</h3>
+        <div class="subtitle">Status mensal por nível de risco</div>
+        <div class="fito-row" id="fitoRow"></div>
+      </div>
+      <div class="card">
+        <h3>Semáforo Ambiental</h3>
+        <div class="subtitle">Indicadores operacionais — leitura rápida</div>
+        <div class="semaforo" id="semaforoRow"></div>
+      </div>
+    </div>
+
+    <div class="grid-2">
       <div class="card">
         <h3>Evolução Histórica do Monitoramento</h3>
         <div class="subtitle">Linha do tempo das campanhas — Quadro 1</div>
@@ -153,6 +384,10 @@ tbody tr:hover{background:#f7faf8;}
           <thead><tr><th>Campanha</th><th>Situação Geral</th><th>Observações</th></tr></thead>
           <tbody id="tblHistorico"></tbody>
         </table>
+      </div>
+      <div class="ia-panel">
+        <h3>🤖 IA Ambiental — Análise Automática</h3>
+        <div class="ia-grid" id="iaGrid"></div>
       </div>
     </div>
 
@@ -177,7 +412,7 @@ tbody tr:hover{background:#f7faf8;}
       <div class="card">
         <h3>Espécies Não Nativas</h3>
         <div class="subtitle">Menor adaptação ao Semiárido</div>
-        <div class="kpi-value" style="font-size:34px;color:var(--amber)">30%</div>
+        <div class="kpi-value" style="font-size:34px;color:var(--warning)">30%</div>
         <ul style="font-size:13px;color:var(--text-sec)">
           <li>Maior suscetibilidade ao estresse hídrico</li>
           <li>Maior demanda evaporativa</li>
@@ -195,9 +430,9 @@ tbody tr:hover{background:#f7faf8;}
 
     <div class="grid-2">
       <div class="card">
-        <h3>Tabela 1 — Comparação de Indicadores Maio × Junho/2026</h3>
+        <h3>Tabela 1 — Comparação de Indicadores Maio × Julho/2026</h3>
         <table>
-          <thead><tr><th>Indicador</th><th>Maio</th><th>Junho</th><th>Tendência</th></tr></thead>
+          <thead><tr><th>Indicador</th><th>Maio</th><th>Junho</th><th>Julho</th><th>Tendência</th></tr></thead>
           <tbody id="tblComparacao"></tbody>
         </table>
       </div>
@@ -264,7 +499,7 @@ tbody tr:hover{background:#f7faf8;}
 
     <div class="section-title">Evolução das Atividades de Manejo (Figura 3)</div>
     <div class="card">
-      <h3>Intensidade Relativa das Ações — Maio × Junho</h3>
+      <h3>Intensidade Relativa das Ações — Maio × Julho</h3>
       <div class="subtitle">Irrigação, manutenção hidráulica, monitoramento, capina/roçagem, inspeções técnicas</div>
       <canvas id="chartManejo"></canvas>
     </div>
@@ -340,8 +575,9 @@ function showTab(id){
 }
 
 Chart.defaults.font.family = "'Segoe UI',Arial,sans-serif";
-Chart.defaults.color = '#5c6b62';
-const GREEN='#2f8f52', GREEN_D='#12522f', AMBER='#e0a638', RED='#c9503f', BLUE='#3d7ab5', GREEN_L='#7bc794';
+Chart.defaults.color = '#8b949e';
+Chart.defaults.borderColor = '#232c3d';
+const GREEN='#00C853', GREEN_D='#0b3d91', AMBER='#FFC107', RED='#FF5252', BLUE='#2196F3', CYAN='#00BCD4';
 
 // --- Chart 1: Survival comparison ---
 new Chart(document.getElementById('chartSurvival'), {
@@ -361,7 +597,7 @@ new Chart(document.getElementById('chartDonut'), {
   type:'doughnut',
   data:{
     labels:['Ações de manejo executadas','Déficit hídrico regional','Herbivoria','Irrigação emergencial','Rebrota das mudas'],
-    datasets:[{data:[30,12,15,25,18], backgroundColor:[GREEN_D,AMBER,RED,BLUE,GREEN_L]}]
+    datasets:[{data:[30,12,15,25,18], backgroundColor:[GREEN_D,AMBER,RED,BLUE,CYAN]}]
   },
   options:{responsive:true, plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:11}}}}}
 });
@@ -371,9 +607,40 @@ new Chart(document.getElementById('chartIndicators'), {
   type:'bar',
   data:{
     labels:['Funcionamento da irrigação','Estabilidade do plantio','Rebrota observada','Controle operacional','Herbivoria','Déficit hídrico'],
-    datasets:[{data:[100,90,85,92,35,25], backgroundColor:[GREEN,GREEN,GREEN_L,GREEN,AMBER,AMBER], borderRadius:6}]
+    datasets:[{data:[100,90,85,92,35,25], backgroundColor:[GREEN,GREEN,CYAN,GREEN,AMBER,AMBER], borderRadius:6}]
   },
   options:{indexAxis:'y', responsive:true, plugins:{legend:{display:false}}, scales:{x:{max:120}}}
+});
+
+// --- Chart Growth ---
+new Chart(document.getElementById('chartGrowth'), {
+  type:'line',
+  data:{
+    labels:['Dez','Jan','Fev','Mar','Abr','Mai','Jun','Jul'],
+    datasets:[{label:'Altura média (cm)', data:[0,15,32,55,73,89,96,100], borderColor:CYAN, backgroundColor:CYAN+'25', tension:.4, fill:true, pointBackgroundColor:CYAN}]
+  },
+  options:{responsive:true, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true,max:110,ticks:{callback:v=>v+'cm'}}}}
+});
+
+// --- Chart Herbivoria ---
+new Chart(document.getElementById('chartHerbivoria'), {
+  type:'line',
+  data:{
+    labels:['Jan','Fev','Mar','Abr','Mai','Jun','Jul'],
+    datasets:[{label:'Índice herbivoria', data:[0,2,4,6,9,7,2], borderColor:RED, backgroundColor:RED+'22', tension:.4, fill:true, pointBackgroundColor:RED}]
+  },
+  options:{responsive:true, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true,max:10}}}
+});
+
+// --- Chart Radar Ambiental ---
+new Chart(document.getElementById('chartRadar'), {
+  type:'radar',
+  data:{
+    labels:['Solo','Umidade','Cobertura','Rebrota','Pragas','Resiliência','Sobrevivência'],
+    datasets:[{label:'Índice', data:[88,72,85,95,60,91,70], borderColor:CYAN, backgroundColor:CYAN+'2A', pointBackgroundColor:CYAN}]
+  },
+  options:{responsive:true, plugins:{legend:{display:false}}, scales:{r:{beginAtZero:true,max:100,
+    grid:{color:'#232c3d'}, angleLines:{color:'#232c3d'}, pointLabels:{color:'#c9d1d9',font:{size:11}}, ticks:{display:false}}}}
 });
 
 // --- Historico table ---
@@ -387,20 +654,20 @@ const historico = [
 document.getElementById('tblHistorico').innerHTML = historico.map(r=>
  `<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td></tr>`).join('');
 
-// --- Comparacao Maio x Junho (Tabela 1) ---
+// --- Comparacao Maio x Julho (Tabela 1) ---
 const comp = [
- ['Mortalidade','Estável','Estável','flat'],
- ['Regeneração Natural','Elevada','Elevada','flat'],
- ['Cobertura Vegetal','Estável','Estável','flat'],
- ['Pragas','Moderada/Alta','Moderada','down'],
- ['Rebrota','Presente','Presente','flat'],
- ['Necessidade de Irrigação','Não','Não','flat'],
- ['Necessidade de Capina','Sim','Sim','flat'],
- ['Necessidade de Coroamento','Sim','Sim','flat'],
+ ['Mortalidade','Estável','Estável','Estável','flat'],
+ ['Regeneração Natural','Elevada','Elevada','Elevada','flat'],
+ ['Cobertura Vegetal','Estável','Estável','Estável','flat'],
+ ['Pragas','Moderada/Alta','Moderada','Baixa','down'],
+ ['Rebrota','Presente','Presente','Presente','flat'],
+ ['Necessidade de Irrigação','Não','Não','Não','flat'],
+ ['Necessidade de Capina','Sim','Sim','Sim','flat'],
+ ['Necessidade de Coroamento','Sim','Sim','Sim','flat'],
 ];
-const arrow = t => t==='down' ? '<span class="arrow" style="color:var(--green-600)">↓</span>' : '<span class="arrow" style="color:#5c6b62">→</span>';
+const arrow = t => t==='down' ? '<span class="arrow" style="color:var(--success)">↓</span>' : '<span class="arrow" style="color:#8b949e">→</span>';
 document.getElementById('tblComparacao').innerHTML = comp.map(r=>
- `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${arrow(r[3])}</td></tr>`).join('');
+ `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${arrow(r[4])}</td></tr>`).join('');
 
 // --- Indicadores ecologicos (Tabela 4) ---
 const ecolog = [
@@ -504,13 +771,13 @@ const areas = [
 ];
 document.getElementById('tblAreas').innerHTML = areas.map(r=>
  `<tr><td><b>${r[0]}</b></td><td>${r[1]} S</td><td>${r[2]} W</td><td>${r[3].toFixed(2)} ha</td></tr>`).join('')
- + `<tr style="background:var(--green-100);font-weight:700"><td colspan="3">TOTAL</td><td>4,74 ha</td></tr>`;
+ + `<tr style="background:#101a2c;font-weight:700"><td colspan="3">TOTAL</td><td>4,74 ha</td></tr>`;
 
 new Chart(document.getElementById('chartAreas'), {
   type:'bar',
   data:{
     labels: areas.map(a=>a[0]),
-    datasets:[{data: areas.map(a=>a[3]), backgroundColor:GREEN, borderRadius:5}]
+    datasets:[{data: areas.map(a=>a[3]), backgroundColor:CYAN, borderRadius:5}]
   },
   options:{responsive:true, plugins:{legend:{display:false}}, scales:{y:{title:{display:true,text:'hectares'}}}}
 });
@@ -532,6 +799,94 @@ const crono = [
 ];
 document.getElementById('tblCronograma').innerHTML = crono.map(r=>
  `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]?'<span class="pill green">✓ Concluído</span>':'<span class="pill blue">Programado</span>'}</td></tr>`).join('');
+
+// ===================== NEW: DYNAMIC WIDGETS =====================
+
+// Exec ring animation (stroke-dashoffset)
+document.querySelectorAll('.exec-card').forEach(card=>{
+  const pct = parseFloat(card.dataset.ring);
+  const circle = card.querySelector('.ring-fg');
+  const r = 38, circumference = 2*Math.PI*r;
+  circle.style.strokeDasharray = circumference;
+  circle.style.strokeDashoffset = circumference;
+  requestAnimationFrame(()=>{ circle.style.strokeDashoffset = circumference - (pct/100)*circumference; });
+});
+
+// Gauge arc animation (semi-circle path length ~251.3)
+requestAnimationFrame(()=>{
+  const arcLen = 251.3, pct = 83;
+  document.getElementById('gaugeArc').style.strokeDashoffset = arcLen - (pct/100)*arcLen;
+});
+
+// Fitossanitário panel
+const fito = [
+ ['Jan','#00C853'],['Fev','#00C853'],['Mar','#FFC107'],['Abr','#FF9800'],['Mai','#FF5252'],['Jun','#FF9800'],['Jul','#00C853']
+];
+document.getElementById('fitoRow').innerHTML = fito.map(f=>
+ `<div class="fito-item"><div class="fito-dot" style="background:${f[1]};color:${f[1]}"></div><div class="fito-month">${f[0]}</div></div>`).join('');
+
+// Semáforo Ambiental
+const semaforo = [
+ ['Solo','#00C853'],['Irrigação','#00C853'],['Crescimento','#00C853'],['Rebrota','#00C853'],
+ ['Cobertura','#00C853'],['Estiagem','#FFC107'],['Herbivoria','#00C853']
+];
+document.getElementById('semaforoRow').innerHTML = semaforo.map(s=>
+ `<div class="sem-item"><span class="sem-dot" style="background:${s[1]};color:${s[1]}"></span>${s[0]}</div>`).join('');
+
+// IA Ambiental conclusões
+const iaConclusoes = [
+ 'Sem necessidade de replantio',
+ 'Herbivoria em redução',
+ 'Regeneração ativa',
+ 'Manejo adequado',
+ 'Recuperação fisiológica positiva',
+ 'Tendência ecológica estável'
+];
+document.getElementById('iaGrid').innerHTML = iaConclusoes.map(c=>
+ `<div class="ia-item"><span class="check">✓</span>${c}</div>`).join('');
+
+// ===================== LIVE CLOCK / DATE / COUNTERS =====================
+const IMPLANT_DATE = new Date(2026,1,1,0,0,0); // 01/02/2026 - plantio concluído
+const NEXT_MONITOR = new Date(2026,7,15,0,0,0); // 15/08/2026
+
+function pad(n){return String(n).padStart(2,'0');}
+
+function updateClock(){
+  const now = new Date();
+  document.getElementById('liveClock').textContent = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+  const dias=['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado'];
+  const meses=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+  document.getElementById('liveDate').textContent = `${dias[now.getDay()]}, ${now.getDate()} de ${meses[now.getMonth()]} de ${now.getFullYear()}`;
+
+  // Tempo desde implantação
+  const diffMs = now - IMPLANT_DATE;
+  const totalDays = Math.floor(diffMs/86400000);
+  const years = Math.floor(totalDays/365);
+  const months = Math.floor((totalDays%365)/30);
+  const days = (totalDays%365)%30;
+  document.getElementById('kpiImplantTime').textContent = `${years}a ${months}m ${days}d`;
+
+  // Idade fisiológica (dias)
+  document.getElementById('kpiPhysioAge').textContent = `${totalDays} dias`;
+
+  // Crescimento médio cm/dia = 100 / idade dias
+  const growth = totalDays>0 ? (100/totalDays) : 0;
+  document.getElementById('kpiGrowthRate').textContent = `${growth.toFixed(3)} cm/dia`;
+
+  // Countdown próximo monitoramento
+  const rem = NEXT_MONITOR - now;
+  if(rem>0){
+    const rd = Math.floor(rem/86400000);
+    const rh = Math.floor((rem%86400000)/3600000);
+    const rm = Math.floor((rem%3600000)/60000);
+    const rs = Math.floor((rem%60000)/1000);
+    document.getElementById('kpiCountdown').textContent = `${rd}d ${pad(rh)}:${pad(rm)}:${pad(rs)}`;
+  } else {
+    document.getElementById('kpiCountdown').textContent = 'Vencido';
+  }
+}
+updateClock();
+setInterval(updateClock, 1000);
 </script>
 </body>
 </html>
