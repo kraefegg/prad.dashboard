@@ -190,7 +190,7 @@ tbody tr:hover{background:#101a2c;}
       <b style="color:#fff">92%</b>
     </div>
     <div class="db-sep"></div>
-    <span class="status-chip ok">● REPLANTIO NÃO RECOMENDADO NESTA FASE</span>
+    <span class="status-chip ok">● SEM NECESSIDADE DE REPLANTIO</span>
   </div>
 
   <div class="tabs">
@@ -439,7 +439,7 @@ tbody tr:hover{background:#101a2c;}
       <div class="card">
         <h3>Tabela 4 — Indicadores Ecológicos</h3>
         <table>
-          <thead><tr><th>Indicador</th><th>Maio</th><th>Junho</th></tr></thead>
+          <thead><tr><th>Indicador</th><th>Maio</th><th>Junho</th><th>Julho</th></tr></thead>
           <tbody id="tblEcologicos"></tbody>
         </table>
       </div>
@@ -672,14 +672,14 @@ document.getElementById('tblComparacao').innerHTML = comp.map(r=>
 
 // --- Indicadores ecologicos (Tabela 4) ---
 const ecolog = [
- ['Regeneração Natural','Favorável','Favorável'],
- ['Rebrota','Favorável','Favorável'],
- ['Cobertura do Solo','Favorável','Favorável'],
- ['Controle de Processos Erosivos','Favorável','Favorável'],
- ['Serviços Ecossistêmicos','Em recuperação','Em recuperação'],
+ ['Regeneração Natural','Favorável','Favorável','Favorável'],
+ ['Rebrota','Favorável','Favorável','Favorável'],
+ ['Cobertura do Solo','Favorável','Favorável','Favorável'],
+ ['Controle de Processos Erosivos','Favorável','Favorável','Favorável'],
+ ['Serviços Ecossistêmicos','Em recuperação','Em recuperação','Em recuperação'],
 ];
 document.getElementById('tblEcologicos').innerHTML = ecolog.map(r=>
- `<tr><td>${r[0]}</td><td><span class="pill green">${r[1]}</span></td><td><span class="pill green">${r[2]}</span></td></tr>`).join('');
+ `<tr><td>${r[0]}</td><td><span class="pill green">${r[1]}</span></td><td><span class="pill green">${r[2]}</span></td><td><span class="pill green">${r[3]}</span></td></tr>`).join('');
 
 // --- Acoes de manejo (Tabela 3) ---
 const acoes = [
