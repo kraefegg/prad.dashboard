@@ -147,6 +147,34 @@ tbody tr:hover{background:#101a2c;}
 .ia-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;}
 .ia-item{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--gray2);background:rgba(0,188,212,.06);border:1px solid rgba(0,188,212,.18);border-radius:8px;padding:10px 12px;}
 .ia-item span.check{color:var(--success);font-weight:900;}
+
+/* ===== DEV STAGE ===== */
+.dev-stage-track{display:flex;align-items:center;justify-content:space-between;background:#101a2c;border:1px solid #232c3d;border-radius:10px;padding:16px 10px;gap:4px;}
+.dev-step{flex:1;text-align:center;position:relative;}
+.dev-step .dev-icon{font-size:26px;opacity:.35;filter:grayscale(1);transition:.3s;}
+.dev-step.active .dev-icon{opacity:1;filter:none;transform:scale(1.15);text-shadow:0 0 14px var(--cyan);}
+.dev-step .dev-name{font-size:10.5px;color:var(--text-sec);margin-top:6px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;}
+.dev-step.active .dev-name{color:var(--cyan);}
+.dev-step::after{content:'';position:absolute;top:16px;left:50%;width:100%;height:2px;background:#232c3d;z-index:0;}
+.dev-step:last-child::after{display:none;}
+.dev-step.done::after{background:var(--success);}
+.dev-compare{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px;}
+.dev-col{background:#101a2c;border:1px solid #232c3d;border-radius:10px;padding:12px 14px;}
+.dev-col-title{font-size:12.5px;font-weight:800;margin-bottom:4px;}
+.dev-col-stage{font-size:15px;font-weight:800;color:#fff;margin-bottom:6px;}
+.dev-col-note{font-size:11.5px;color:var(--text-sec);line-height:1.4;}
+
+/* ===== WEATHER ===== */
+.weather-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;}
+.weather-loading{grid-column:1/-1;text-align:center;color:var(--text-sec);font-size:12.5px;padding:20px 0;}
+.w-item{background:#101a2c;border:1px solid #232c3d;border-radius:10px;padding:12px 10px;text-align:center;}
+.w-item .w-val{font-size:19px;font-weight:800;color:#fff;font-variant-numeric:tabular-nums;}
+.w-item .w-lbl{font-size:10.5px;color:var(--text-sec);text-transform:uppercase;letter-spacing:.4px;margin-top:2px;}
+.w-updated{grid-column:1/-1;text-align:right;font-size:10.5px;color:var(--text-sec);margin-top:4px;}
+.weather-links{margin-top:14px;border-top:1px solid #232c3d;padding-top:10px;}
+.wl-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;}
+.wl-row a{background:rgba(0,188,212,.1);border:1px solid rgba(0,188,212,.3);color:var(--cyan);text-decoration:none;font-size:11px;font-weight:700;padding:5px 11px;border-radius:16px;transition:.2s;}
+.wl-row a:hover{background:rgba(0,188,212,.22);}
 </style>
 </head>
 <body>
@@ -190,7 +218,7 @@ tbody tr:hover{background:#101a2c;}
       <b style="color:#fff">92%</b>
     </div>
     <div class="db-sep"></div>
-    <span class="status-chip ok">●REPLANTIO NÃO RECOMENDADO NESTA FASE</span>
+    <span class="status-chip ok">● REPLANTIO NÃO RECOMENDADO NESTA FASE</span>
   </div>
 
   <div class="tabs">
@@ -262,7 +290,7 @@ tbody tr:hover{background:#101a2c;}
       </div>
     </div>
 
-    <div class="note">📌 <b>Conclusão técnica:</b> Não foram verificadas alterações significativas frente a Maio/2026. Área em fase de estabilidade ecológica. Fatores supervenientes (estiagem, herbivoria) não caracterizam falha de implantação. Reposição de mudas <b>não recomendada</b> neste momento.</div>
+    <div class="note">📌 <b>Conclusão técnica:</b> Não foram verificadas alterações significativas frente a Maio/2026. Condições estabelecidas entre maio e julho. Área em fase de estabilidade ecológica. Fatores supervenientes (estiagem, herbivoria) não caracterizam falha de implantação. Reposição de mudas <b>não recomendada</b> neste momento.</div>
 
     <div class="section-title">Painel Executivo — Indicadores Consolidados</div>
     <div class="grid-6">
@@ -307,6 +335,49 @@ tbody tr:hover{background:#101a2c;}
           <circle class="ring-fg" cx="45" cy="45" r="38" stroke="var(--danger)"></circle>
         </svg><div class="ring-val">18%</div></div>
         <div class="ring-label">Risco</div>
+      </div>
+    </div>
+
+    <div class="section-title">Monitoramento em Tempo Real & Status de Desenvolvimento</div>
+    <div class="grid-2">
+      <div class="card">
+        <h3>🌱 Status de Desenvolvimento das Mudas</h3>
+        <div class="subtitle">Estágio fisiológico atual · calculado a partir da data de implantação</div>
+        <div class="dev-stage-track" id="devStageTrack"></div>
+        <div class="ia-grid" style="margin-top:14px">
+          <div class="ia-item"><span class="check">✓</span>Herbivoria reduzida consideravelmente</div>
+          <div class="ia-item"><span class="check">✓</span>Rebrotagem detectada em diversos indivíduos</div>
+        </div>
+        <div class="dev-compare">
+          <div class="dev-col">
+            <div class="dev-col-title" style="color:var(--success)">🌳 Nativas</div>
+            <div class="dev-col-stage" id="devNativeStage">—</div>
+            <div class="dev-col-note">Recuperação de copa em curso · maior plasticidade ecológica ao déficit hídrico do Semiárido.</div>
+          </div>
+          <div class="dev-col">
+            <div class="dev-col-title" style="color:var(--warning)">🌿 Não Nativas</div>
+            <div class="dev-col-stage" id="devExoticStage">—</div>
+            <div class="dev-col-note">Estabelecimento mais lento · maior sensibilidade ao estresse hídrico e evaporativo.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>🌡️ Monitor Meteorológico — Caraúbas-PB</h3>
+        <div class="subtitle">Dados em tempo real · Open-Meteo (fonte com API pública aberta)</div>
+        <div id="weatherLive" class="weather-grid">
+          <div class="weather-loading">Carregando dados meteorológicos em tempo real...</div>
+        </div>
+        <div class="weather-links">
+          <span style="color:var(--text-sec);font-size:11px">Fontes complementares oficiais (sem API pública embutível — consulta manual):</span>
+          <div class="wl-row">
+            <a href="https://previsao.inmet.gov.br/" target="_blank" rel="noopener">INMET</a>
+            <a href="https://www.cptec.inpe.br/" target="_blank" rel="noopener">CPTEC/INPE</a>
+            <a href="https://queimadas.dgi.inpe.br/queimadas/portal" target="_blank" rel="noopener">INPE Queimadas</a>
+            <a href="https://www.embrapa.br/agencia-de-informacao-tecnologica" target="_blank" rel="noopener">EMBRAPA AGEITEC</a>
+            <a href="https://www.aesa.pb.gov.br/" target="_blank" rel="noopener">AESA-PB (Pluviometria)</a>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -477,7 +548,7 @@ tbody tr:hover{background:#101a2c;}
     </div>
 
     <div class="card">
-      <h3>Quadro 2 — Painel de Indicadores Ambientais Consolidado (Maio–Junho/2026)</h3>
+      <h3>Quadro 2 — Painel de Indicadores Ambientais Consolidado (Maio–Julho/2026)</h3>
       <table>
         <thead><tr><th>Fator</th><th>Influência Observada</th><th>Avaliação Técnica</th></tr></thead>
         <tbody id="tblPainel"></tbody>
@@ -506,7 +577,7 @@ tbody tr:hover{background:#101a2c;}
 
     <div class="grid-2">
       <div class="card">
-        <h3>Escopo do Monitoramento — Junho/2026</h3>
+        <h3>Escopo do Monitoramento — Julho/2026</h3>
         <ul class="two-col-list">
           <li>✅ Inspeção técnica das áreas recuperadas</li>
           <li>✅ Avaliação da sobrevivência das mudas</li>
@@ -651,6 +722,7 @@ const historico = [
  ['Abril/2026','Continuidade da irrigação','Manutenções preventivas de motobombas e mangueiras'],
  ['Maio/2026','Encerramento da irrigação emergencial','Consolidação das mudas sobreviventes'],
  ['Junho/2026','Estabilidade do cenário','Sem alterações significativas nos indicadores'],
+ ['Julho/2026','Estabilidade do cenário','Sem alterações significativas nos indicadores'],
 ];
 document.getElementById('tblHistorico').innerHTML = historico.map(r=>
  `<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td></tr>`).join('');
@@ -886,8 +958,62 @@ function updateClock(){
     document.getElementById('kpiCountdown').textContent = 'Vencido';
   }
 }
+// ===================== DEV STAGE (Nativas x Não Nativas) =====================
+const devStages = [
+ {icon:'🌱',name:'Aquisição'},
+ {icon:'🌿',name:'Estabelecimento'},
+ {icon:'🪴',name:'Crescimento Ativo'},
+ {icon:'🌳',name:'Consolidação'}
+];
+function renderDevTrack(activeIdx){
+  const track = document.getElementById('devStageTrack');
+  track.innerHTML = devStages.map((s,i)=>
+   `<div class="dev-step ${i===activeIdx?'active':''} ${i<activeIdx?'done':''}">
+      <div class="dev-icon">${s.icon}</div><div class="dev-name">${s.name}</div>
+    </div>`).join('');
+}
+function updateDevStage(totalDays){
+  // Nativas: desenvolvimento mais rápido (plasticidade maior)
+  const nativeIdx = totalDays<45?0:totalDays<110?1:totalDays<180?2:3;
+  // Não nativas: desenvolvimento mais lento (maior sensibilidade hídrica)
+  const exoticIdx = totalDays<70?0:totalDays<150?1:totalDays<230?2:3;
+  renderDevTrack(nativeIdx);
+  document.getElementById('devNativeStage').textContent = devStages[nativeIdx].name;
+  document.getElementById('devExoticStage').textContent = devStages[exoticIdx].name;
+}
+
+// ===================== LIVE WEATHER (Open-Meteo — API pública, sem chave) =====================
+const WX_LAT=-7.727, WX_LON=-36.492;
+async function loadWeather(){
+  const el = document.getElementById('weatherLive');
+  try{
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${WX_LAT}&longitude=${WX_LON}&current=temperature_2m,relative_humidity_2m,precipitation,wind_speed_10m,wind_direction_10m&daily=precipitation_sum,temperature_2m_max,temperature_2m_min&timezone=America%2FSao_Paulo`;
+    const res = await fetch(url);
+    if(!res.ok) throw new Error('fetch failed');
+    const data = await res.json();
+    const c = data.current;
+    const d = data.daily;
+    const dirs=['N','NE','L','SE','S','SO','O','NO'];
+    const dirTxt = dirs[Math.round(c.wind_direction_10m/45)%8];
+    el.innerHTML = `
+      <div class="w-item"><div class="w-val">${c.temperature_2m.toFixed(1)}°C</div><div class="w-lbl">Temperatura</div></div>
+      <div class="w-item"><div class="w-val">${c.relative_humidity_2m}%</div><div class="w-lbl">Umidade</div></div>
+      <div class="w-item"><div class="w-val">${c.wind_speed_10m.toFixed(1)} km/h</div><div class="w-lbl">Vento ${dirTxt}</div></div>
+      <div class="w-item"><div class="w-val">${c.precipitation.toFixed(1)} mm</div><div class="w-lbl">Precipitação atual</div></div>
+      <div class="w-item"><div class="w-val">${d.temperature_2m_max[0].toFixed(0)}° / ${d.temperature_2m_min[0].toFixed(0)}°</div><div class="w-lbl">Máx / Mín hoje</div></div>
+      <div class="w-item"><div class="w-val">${d.precipitation_sum[0].toFixed(1)} mm</div><div class="w-lbl">Chuva acumulada (dia)</div></div>
+      <div class="w-updated">Atualizado ${new Date().toLocaleTimeString('pt-BR')} · fonte: Open-Meteo (lat ${WX_LAT}, lon ${WX_LON})</div>`;
+  }catch(e){
+    el.innerHTML = `<div class="weather-loading">Sem conexão com a API meteorológica no momento. Consulte as fontes oficiais abaixo.</div>`;
+  }
+}
+loadWeather();
+setInterval(loadWeather, 10*60*1000);
+
 updateClock();
+updateDevStage(Math.floor((new Date()-IMPLANT_DATE)/86400000));
 setInterval(updateClock, 1000);
+setInterval(()=>updateDevStage(Math.floor((new Date()-IMPLANT_DATE)/86400000)), 60000);
 </script>
 </body>
 </html>
