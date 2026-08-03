@@ -264,9 +264,9 @@ tbody tr:hover{background:#101a2c;}
         <div class="trend up" style="color:var(--success)">▼ de Moderada/Alta (Maio)</div>
       </div>
       <div class="kpi-card cyan">
-        <div class="kpi-label">Tempo desde a Implantação</div>
+        <div class="kpi-label">Tempo desde Fim da Execução</div>
         <div class="kpi-value" id="kpiImplantTime">—</div>
-        <div class="kpi-sub">desde 01/02/2026</div>
+        <div class="kpi-sub">desde 15/12/2025</div>
       </div>
       <div class="kpi-card blue">
         <div class="kpi-label">Próximo Monitoramento</div>
@@ -274,9 +274,9 @@ tbody tr:hover{background:#101a2c;}
         <div class="kpi-sub">Campanha 8 · 15/08/2026</div>
       </div>
       <div class="kpi-card cyan">
-        <div class="kpi-label">Idade Fisiológica das Mudas</div>
+        <div class="kpi-label">Idade Fisiológica das Mudas desde Implantação</div>
         <div class="kpi-value" id="kpiPhysioAge">—</div>
-        <div class="kpi-sub">baseado na data de implantação</div>
+        <div class="kpi-sub">75 dias de implantação + tempo desde 15/12/2025</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-label">Crescimento Médio</div>
@@ -290,7 +290,7 @@ tbody tr:hover{background:#101a2c;}
       </div>
     </div>
 
-    <div class="note">📌 <b>Conclusão técnica:</b> Não foram verificadas alterações significativas frente a Maio/2026. Condições estabelecidas entre maio e julho. Área em fase de estabilidade ecológica. Fatores supervenientes (estiagem, herbivoria) não caracterizam falha de implantação. Reposição de mudas <b>não recomendada</b> neste momento.</div>
+    <div class="note">📌 <b>Conclusão técnica:</b> Não foram verificadas alterações significativas frente a Maio/2026. Dados comparados desde maio-julho. Área em fase de estabilidade ecológica. Fatores supervenientes (estiagem, herbivoria) não caracterizam falha de implantação. Reposição de mudas <b>não recomendada</b> neste momento.</div>
 
     <div class="section-title">Painel Executivo — Indicadores Consolidados</div>
     <div class="grid-6">
@@ -919,7 +919,9 @@ document.getElementById('iaGrid').innerHTML = iaConclusoes.map(c=>
  `<div class="ia-item"><span class="check">✓</span>${c}</div>`).join('');
 
 // ===================== LIVE CLOCK / DATE / COUNTERS =====================
-const IMPLANT_DATE = new Date(2026,1,1,0,0,0); // 01/02/2026 - plantio concluído
+const IMPLANT_DATE = new Date(2026,1,1,0,0,0); // 01/02/2026 - referência para estágio de desenvolvimento
+const EXEC_END_DATE = new Date(2025,11,15,0,0,0); // 15/12/2025 - fim da execução do plantio
+const IMPLANT_BASE_DAYS = 75; // tempo total do processo de implantação
 const NEXT_MONITOR = new Date(2026,7,15,0,0,0); // 15/08/2026
 
 function pad(n){return String(n).padStart(2,'0');}
@@ -931,19 +933,20 @@ function updateClock(){
   const meses=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
   document.getElementById('liveDate').textContent = `${dias[now.getDay()]}, ${now.getDate()} de ${meses[now.getMonth()]} de ${now.getFullYear()}`;
 
-  // Tempo desde implantação
-  const diffMs = now - IMPLANT_DATE;
+  // Tempo desde fim da execução (15/12/2025)
+  const diffMs = now - EXEC_END_DATE;
   const totalDays = Math.floor(diffMs/86400000);
   const years = Math.floor(totalDays/365);
   const months = Math.floor((totalDays%365)/30);
   const days = (totalDays%365)%30;
   document.getElementById('kpiImplantTime').textContent = `${years}a ${months}m ${days}d`;
 
-  // Idade fisiológica (dias)
-  document.getElementById('kpiPhysioAge').textContent = `${totalDays} dias`;
+  // Idade fisiológica = 75 dias de implantação + dias desde fim da execução
+  const physioAgeDays = IMPLANT_BASE_DAYS + totalDays;
+  document.getElementById('kpiPhysioAge').textContent = `${physioAgeDays} dias`;
 
-  // Crescimento médio cm/dia = 100 / idade dias
-  const growth = totalDays>0 ? (100/totalDays) : 0;
+  // Crescimento médio cm/dia = 100 / idade fisiológica total
+  const growth = physioAgeDays>0 ? (100/physioAgeDays) : 0;
   document.getElementById('kpiGrowthRate').textContent = `${growth.toFixed(3)} cm/dia`;
 
   // Countdown próximo monitoramento
